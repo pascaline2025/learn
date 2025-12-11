@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+        <h2>Welcome Back</h2>
+
+        <div id="errorMessage" class="error"></div>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn">Login</button>
+
+            <p class="signup-text">
+                Don't have an account? <a href="#">Sign up</a>
+            </p>
+        </form>
+    </div>
+
+
+    <!-- JavaScript Validation + Fake Backend -->
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const errorBox = document.getElementById("errorMessage");
+
+            // Basic validation
+            if (email === "" || password === "") {
+                errorBox.textContent = "Please fill in all fields.";
+                return;
+            }
+
+            if (!email.includes("@") || !email.includes(".")) {
+                errorBox.textContent = "Enter a valid email address.";
+                return;
+            }
+
+            if (password.length < 6) {
+                errorBox.textContent = "Password must be at least 6 characters.";
+                return;
+            }
+
+            errorBox.textContent = "";
+
+            // Fake backend check
+            const fakeUser = {
+                email: "test@gmail.com",
+                password: "123456"
+            };
+
+            if (email === fakeUser.email && password === fakeUser.password) {
+                alert("Login successful!");
+                window.location.href = "dashboard.html"; // redirect
+            } else {
+                errorBox.textContent = "Incorrect email or password.";
+            }
+        });
+    </script>
+
+</body>
+</html>
