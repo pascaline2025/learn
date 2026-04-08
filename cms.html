@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Pueri Cantores Gaseke - Choir Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #c0392b;
+            --dark-bg: #1a1a2e;
+            --darker-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-light: #e9ecef;
+            --text-muted: #adb5bd;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-light);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        #landingPage {
+            display: block;
+        }
+
+        #landingPage.hidden {
+            display: none;
+        }
+
+        .dashboard-container {
+            display: none;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        .dashboard-container.active {
+            display: block;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+            background: var(--gradient-2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s ease;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-menu-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .mobile-menu-toggle i {
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-menu-toggle.active i {
+            transform: rotate(90deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .hero-section {
+            background: var(--gradient-1);
+            padding: 120px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--secondary-color);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-custom {
+            background: var(--gradient-2);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .btn-custom:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+            color: white;
+        }
+
+        .auth-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--secondary-color);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            background: var(--darker-bg);
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-header h3 {
+            color: var(--secondary-color);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .user-profile {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: var(--gradient-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .role-badge {
+            background: var(--gradient-2);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            padding: 15px 25px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255,255,255,0.05);
+            border-left-color: var(--secondary-color);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: rgba(255,255,255,0.1);
+            border-left-color: var(--secondary-color);
+        }
+
+        .nav-link i {
+            width: 25px;
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            padding: 30px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+            background: var(--dark-bg);
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary-color);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        .table-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .table {
+            color: var(--text-light);
+            margin-bottom: 0;
+            min-width: 600px;
+        }
+
+        .table thead th {
+            border-bottom-color: rgba(255,255,255,0.1);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .table td {
+            border-bottom-color: rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+
+        .badge-voice {
+            background: var(--gradient-1);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .badge-role {
+            background: var(--gradient-2);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .filter-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .filter-title {
+            color: var(--secondary-color);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .filter-item {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .filter-select, .filter-input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+        }
+
+        .clear-filter {
+            color: var(--secondary-color);
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .search-results-info {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+
+        .highlight {
+            background: var(--secondary-color);
+            color: white;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .drag-drop-area {
+            border: 2px dashed var(--secondary-color);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            background: rgba(255,255,255,0.02);
+            transition: all 0.3s;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        .drag-drop-area:hover {
+            background: rgba(231, 76, 60, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        .drag-drop-area.dragover {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: var(--secondary-color);
+            transform: scale(1.02);
+        }
+
+        .drag-drop-icon {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .file-list {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-item i {
+            color: var(--secondary-color);
+            margin-right: 10px;
+        }
+
+        .file-item .remove-file {
+            color: var(--danger-color);
+            cursor: pointer;
+        }
+
+        .file-info {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            color: var(--text-light);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .modal-header {
+            border-bottom-color: rgba(255,255,255,0.1);
+        }
+
+        .modal-footer {
+            border-top-color: rgba(255,255,255,0.1);
+        }
+
+        .form-control, .form-select {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-light);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(0,0,0,0.5);
+            border-color: var(--secondary-color);
+            color: var(--text-light);
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        .quick-action-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-light);
+            padding: 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            text-align: left;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--gradient-2);
+            border-color: transparent;
+            transform: translateX(5px);
+        }
+
+        .attachment-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .attachment-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .download-btn {
+            background: transparent;
+            border: 1px solid var(--secondary-color);
+            color: var(--secondary-color);
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .download-all-btn {
+            background: var(--gradient-2);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .download-all-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .file-download-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .file-download-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .song-attachments {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .icon-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        .progress-bar {
+            border-radius: 4px;
+        }
+
+        .divider {
+            width: 100px;
+            height: 4px;
+            background: var(--gradient-2);
+            margin: 0 auto 30px;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                width: 85%;
+                max-width: 300px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+                opacity: 1;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 70px 15px 15px 15px;
+            }
+
+            .filter-group {
+                flex-direction: column;
+            }
+
+            .filter-item {
+                width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .table-card {
+                padding: 15px;
+            }
+
+            .table {
+                font-size: 0.9rem;
+            }
+
+            .display-4 {
+                font-size: 2rem !important;
+            }
+            
+            .lead {
+                font-size: 1.2rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 70px 10px 10px 10px;
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .mobile-menu-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+                top: 10px;
+                left: 10px;
+            }
+
+            .sidebar {
+                width: 90%;
+            }
+
+            .user-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Landing Page -->
+    <div id="landingPage">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-transparent position-absolute w-100">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-music me-2"></i>
+                    Pueri Cantores Gaseke
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#home">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#features">Features</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <button class="btn btn-custom ms-3" onclick="showAuthModal()">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login / Sign Up
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <section class="hero-section text-center" id="home">
+            <div class="container">
+                <h1 class="display-3 mb-4">Welcome to Pueri Cantores Gaseke</h1>
+                <p class="lead mb-5">A comprehensive management system for our beloved choir</p>
+                <button class="btn btn-custom btn-lg" onclick="showAuthModal()">
+                    <i class="fas fa-sign-in-alt me-2"></i>Get Started
+                </button>
+            </div>
+        </section>
+
+        <section class="py-5" id="features">
+            <div class="container">
+                <h2 class="text-center text-white mb-5">System Features</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <i class="fas fa-users feature-icon"></i>
+                            <h3>Member Management</h3>
+                            <p class="text-muted">Easily manage all choir members, their information, and voice parts</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <i class="fas fa-music feature-icon"></i>
+                            <h3>Song Library</h3>
+                            <p class="text-muted">Upload and organize all choir songs with lyrics and downloadable files</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <i class="fas fa-crown feature-icon"></i>
+                            <h3>Leadership Management</h3>
+                            <p class="text-muted">Track choir leaders and their responsibilities</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <i class="fas fa-calendar-alt feature-icon"></i>
+                            <h3>Event Planning</h3>
+                            <p class="text-muted">Schedule rehearsals, performances, and track attendance</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <i class="fas fa-chart-bar feature-icon"></i>
+                            <h3>Dashboard Analytics</h3>
+                            <p class="text-muted">Get insights into choir statistics and activities</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card">
+                            <i class="fas fa-shield-alt feature-icon"></i>
+                            <h3>Secure Access</h3>
+                            <p class="text-muted">Role-based access control for different user types</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal fade" id="authModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Welcome to Pueri Cantores Gaseke</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="auth-container">
+                        <div class="auth-tabs">
+                            <div class="auth-tab active" onclick="showAuthTab('login')">Login</div>
+                            <div class="auth-tab" onclick="showAuthTab('signup')">Sign Up</div>
+                        </div>
+                        
+                        <div id="loginForm" class="auth-form active">
+                            <form onsubmit="handleLogin(event)">
+                                <div class="mb-3">
+                                    <label class="form-label">Username or Email</label>
+                                    <input type="text" class="form-control" id="loginUsername" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="loginPassword" required>
+                                </div>
+                                <button type="submit" class="btn btn-custom w-100">Login</button>
+                            </form>
+                        </div>
+                        
+                        <div id="signupForm" class="auth-form">
+                            <form onsubmit="handleSignup(event)">
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="signupFullname" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="signupUsername" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="signupEmail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="signupPassword" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Role</label>
+                                    <select class="form-control" id="signupRole">
+                                        <option value="member">Member</option>
+                                        <option value="leader">Leader</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-custom w-100">Sign Up</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Container -->
+    <div id="dashboardContainer" class="dashboard-container">
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileMenu()"></div>
+
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-music me-2"></i>PC Gaseke</h3>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h5 id="userFullName">Loading...</h5>
+                <span class="role-badge" id="userRole">Loading...</span>
+            </div>
+            
+            <nav class="nav flex-column" id="sidebarNav"></nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Welcome Section -->
+            <div class="container-fluid">
+                <!-- Welcome Header -->
+                <div class="text-center mb-5">
+                    <div class="welcome-icon mb-4">
+                        <i class="fas fa-users" style="font-size: 5rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                    </div>
+                    <h1 class="display-4 mb-3" style="color: #e9ecef; font-weight: 700;">
+                        Welcome to Pueri Cantores Gaseke
+                    </h1>
+                    <p class="lead mb-4" style="color: #adb5bd; font-size: 1.5rem;">
+                        "The Voice of Angels"
+                    </p>
+                    <div class="divider"></div>
+                    <p style="color: #adb5bd; font-size: 1.2rem; max-width: 800px; margin: 0 auto;">
+                        A comprehensive management system for our beloved choir of young voices. 
+                        Nurturing talent, preserving tradition, and creating beautiful music together.
+                    </p>
+                </div>
+
+                <!-- Children Information Cards -->
+                <div class="row g-4 mb-5">
+                    <!-- Total Children Card -->
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-circle" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <i class="fas fa-child" style="font-size: 1.8rem; color: white;"></i>
+                                </div>
+                                <div style="margin-left: 15px;">
+                                    <h3 style="margin: 0; color: #e9ecef; font-weight: 700;" id="totalChildrenCount">24</h3>
+                                    <p style="margin: 5px 0 0; color: #adb5bd;">Total Children</p>
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 100%; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                            </div>
+                            <p class="mt-3" style="color: #adb5bd; font-size: 0.9rem;">
+                                <i class="fas fa-arrow-up" style="color: #27ae60;"></i> +4 new members this month
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Voice Parts Distribution Card -->
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-circle" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <i class="fas fa-music" style="font-size: 1.8rem; color: white;"></i>
+                                </div>
+                                <div style="margin-left: 15px;">
+                                    <h3 style="margin: 0; color: #e9ecef; font-weight: 700;">Voice Parts</h3>
+                                    <p style="margin: 5px 0 0; color: #adb5bd;">Distribution</p>
+                                </div>
+                            </div>
+                            <div class="voice-distribution mt-3">
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span style="color: #adb5bd;">Soprano</span>
+                                    <span style="color: #e9ecef; font-weight: 600;" id="sopranoCount">8</span>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" style="width: 33%; background: #e74c3c;"></div>
+                                </div>
+                                
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span style="color: #adb5bd;">Alto</span>
+                                    <span style="color: #e9ecef; font-weight: 600;" id="altoCount">6</span>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" style="width: 25%; background: #3498db;"></div>
+                                </div>
+                                
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span style="color: #adb5bd;">Tenor</span>
+                                    <span style="color: #e9ecef; font-weight: 600;" id="tenorCount">5</span>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" style="width: 21%; background: #f39c12;"></div>
+                                </div>
+                                
+                                <div class="mb-2 d-flex justify-content-between">
+                                    <span style="color: #adb5bd;">Bass</span>
+                                    <span style="color: #e9ecef; font-weight: 600;" id="bassCount">5</span>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" style="width: 21%; background: #27ae60;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats Card -->
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="icon-circle" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                    <i class="fas fa-chart-line" style="font-size: 1.8rem; color: white;"></i>
+                                </div>
+                                <div style="margin-left: 15px;">
+                                    <h3 style="margin: 0; color: #e9ecef; font-weight: 700;">Quick Stats</h3>
+                                    <p style="margin: 5px 0 0; color: #adb5bd;">Choir Overview</p>
+                                </div>
+                            </div>
+                            
+                            <div class="stats-list mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span style="color: #adb5bd;"><i class="fas fa-calendar-check me-2" style="color: #e74c3c;"></i> Rehearsals This Week</span>
+                                    <span class="badge" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 5px 10px; border-radius: 20px;">3</span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span style="color: #adb5bd;"><i class="fas fa-music me-2" style="color: #3498db;"></i> Songs in Repertoire</span>
+                                    <span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 5px 10px; border-radius: 20px;" id="totalSongsCount">45</span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span style="color: #adb5bd;"><i class="fas fa-calendar-alt me-2" style="color: #f39c12;"></i> Upcoming Performances</span>
+                                    <span class="badge" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 5px 10px; border-radius: 20px;">2</span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span style="color: #adb5bd;"><i class="fas fa-crown me-2" style="color: #27ae60;"></i> Section Leaders</span>
+                                    <span class="badge" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 5px 10px; border-radius: 20px;" id="leadersCount">4</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Section - Children in Action -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="table-card">
+                            <h5 class="mb-4" style="color: #e74c3c; font-weight: 600;">
+                                <i class="fas fa-star me-2"></i> Featured Young Singers
+                            </h5>
+                            
+                            <div class="featured-singers">
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="icon-circle" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); font-size: 1.5rem; font-weight: bold; color: white;">
+                                        A
+                                    </div>
+                                    <div style="margin-left: 15px;">
+                                        <h6 style="margin: 0; color: #e9ecef; font-weight: 600;">Anna M. - Soprano</h6>
+                                        <p style="margin: 5px 0 0; color: #adb5bd; font-size: 0.9rem;">Member since 2023 • Lead Soprano in "Ave Maria"</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-4">
+                                    <div class="icon-circle" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-size: 1.5rem; font-weight: bold; color: white;">
+                                        M
+                                    </div>
+                                    <div style="margin-left: 15px;">
+                                        <h6 style="margin: 0; color: #e9ecef; font-weight: 600;">Michael K. - Tenor</h6>
+                                        <p style="margin: 5px 0 0; color: #adb5bd; font-size: 0.9rem;">Member since 2022 • Perfect attendance record</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-circle" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); font-size: 1.5rem; font-weight: bold; color: white;">
+                                        S
+                                    </div>
+                                    <div style="margin-left: 15px;">
+                                        <h6 style="margin: 0; color: #e9ecef; font-weight: 600;">Sarah W. - Alto</h6>
+                                        <p style="margin: 5px 0 0; color: #adb5bd; font-size: 0.9rem;">Member since 2024 • Rising star of the choir</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="table-card">
+                            <h5 class="mb-4" style="color: #e74c3c; font-weight: 600;">
+                                <i class="fas fa-calendar-alt me-2"></i> Upcoming Children's Events
+                            </h5>
+                            
+                            <div class="events-list">
+                                <div class="d-flex align-items-center mb-4">
+                                    <div style="min-width: 60px; text-align: center;">
+                                        <span style="display: block; font-size: 1.5rem; font-weight: bold; color: #e74c3c;">15</span>
+                                        <span style="color: #adb5bd; font-size: 0.8rem;">MAR</span>
+                                    </div>
+                                    <div style="margin-left: 15px;">
+                                        <h6 style="margin: 0; color: #e9ecef; font-weight: 600;">Children's Choir Rehearsal</h6>
+                                        <p style="margin: 5px 0 0; color: #adb5bd; font-size: 0.9rem;">3:00 PM - 5:00 PM • Main Hall</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex align-items-center mb-4">
+                                    <div style="min-width: 60px; text-align: center;">
+                                        <span style="display: block; font-size: 1.5rem; font-weight: bold; color: #e74c3c;">22</span>
+                                        <span style="color: #adb5bd; font-size: 0.8rem;">MAR</span>
+                                    </div>
+                                    <div style="margin-left: 15px;">
+                                        <h6 style="margin: 0; color: #e9ecef; font-weight: 600;">Spring Concert Preparation</h6>
+                                        <p style="margin: 5px 0 0; color: #adb5bd; font-size: 0.9rem;">4:00 PM - 6:00 PM • Music Room</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex align-items-center">
+                                    <div style="min-width: 60px; text-align: center;">
+                                        <span style="display: block; font-size: 1.5rem; font-weight: bold; color: #e74c3c;">05</span>
+                                        <span style="color: #adb5bd; font-size: 0.8rem;">APR</span>
+                                    </div>
+                                    <div style="margin-left: 15px;">
+                                        <h6 style="margin: 0; color: #e9ecef; font-weight: 600;">Easter Sunday Performance</h6>
+                                        <p style="margin: 5px 0 0; color: #adb5bd; font-size: 0.9rem;">10:00 AM • Main Church</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer Quote -->
+                <div class="text-center mt-5 pt-4">
+                    <p style="color: #6c757d; font-style: italic; font-size: 1.1rem;">
+                        "Let the children come to me, and do not hinder them, for the kingdom of heaven belongs to such as these." 
+                        <br>— Matthew 19:14
+                    </p>
+                    <p style="color: #6c757d; font-size: 0.9rem; margin-top: 20px;">
+                        <i class="fas fa-heart" style="color: #e74c3c;"></i> Nurturing young voices since 1995
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Modal -->
+    <div class="modal fade" id="memberModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add/Edit Member</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="memberForm">
+                        <input type="hidden" id="memberId">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="memberEmail">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" id="memberPhone">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" id="dob">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Voice Part</label>
+                                <select class="form-control" id="voicePart" required>
+                                    <option value="">Select Voice Part</option>
+                                    <option value="soprano">Soprano</option>
+                                    <option value="alto">Alto</option>
+                                    <option value="tenor">Tenor</option>
+                                    <option value="bass">Bass</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" id="address" rows="2"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Emergency Contact</label>
+                                <input type="text" class="form-control" id="emergencyContact">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Emergency Phone</label>
+                                <input type="text" class="form-control" id="emergencyPhone">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMember()">Save Member</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Song Modal -->
+    <div class="modal fade" id="songModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add/Edit Song</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="songForm">
+                        <input type="hidden" id="songId">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Title</label>
+                                <input type="text" class="form-control" id="songTitle" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Category</label>
+                                <select class="form-control" id="songCategory">
+                                    <option value="sacred">Sacred</option>
+                                    <option value="classical">Classical</option>
+                                    <option value="contemporary">Contemporary</option>
+                                    <option value="traditional">Traditional</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Composer</label>
+                                <input type="text" class="form-control" id="composer">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Arranger</label>
+                                <input type="text" class="form-control" id="arranger">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Key</label>
+                                <input type="text" class="form-control" id="keySignature">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Tempo</label>
+                                <input type="text" class="form-control" id="tempo">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Language</label>
+                                <input type="text" class="form-control" id="language">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Song Documents (PDF, Sheet Music, Audio)</label>
+                            <div class="drag-drop-area" id="dragDropArea" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-cloud-upload-alt drag-drop-icon"></i>
+                                <h5>Drag & Drop Files Here</h5>
+                                <p class="text-muted">or click to browse</p>
+                                <input type="file" id="fileInput" multiple style="display: none;" accept=".pdf,.doc,.docx,.txt,.mp3,.wav,.midi,.xml,.mxl">
+                                <div class="file-list" id="fileList"></div>
+                            </div>
+                            <small class="text-muted">Supported formats: PDF, DOC, DOCX, TXT, MP3, WAV, MIDI, MusicXML</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Lyrics</label>
+                            <textarea class="form-control" id="lyrics" rows="5"></textarea>
+                        </div>
+
+                        <div id="existingAttachments" class="attachment-list"></div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSong()">Save Song</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Song Details Modal -->
+    <div class="modal fade" id="songDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="songDetailsTitle">Song Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="songDetailsContent"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize local storage with default data
+        function initializeData() {
+            if (!localStorage.getItem('users')) {
+                const users = [
+                    {
+                        id: 1,
+                        username: 'admin',
+                        email: 'admin@puericantores.org',
+                        password: 'admin123',
+                        fullName: 'System Administrator',
+                        role: 'admin'
+                    },
+                    {
+                        id: 2,
+                        username: 'john_doe',
+                        email: 'john.doe@email.com',
+                        password: 'member123',
+                        fullName: 'John Doe',
+                        role: 'member',
+                        memberId: 1
+                    },
+                    {
+                        id: 3,
+                        username: 'mary_j',
+                        email: 'mary.j@email.com',
+                        password: 'leader123',
+                        fullName: 'Mary Johnson',
+                        role: 'leader',
+                        memberId: 2
+                    }
+                ];
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            if (!localStorage.getItem('members')) {
+                const members = [
+                    {
+                        id: 1,
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        email: 'john.doe@email.com',
+                        phone: '+1234567890',
+                        dob: '1990-01-01',
+                        voicePart: 'tenor',
+                        address: '123 Main St',
+                        emergencyContact: 'Jane Doe',
+                        emergencyPhone: '+0987654321',
+                        joinDate: new Date().toISOString().split('T')[0]
+                    },
+                    {
+                        id: 2,
+                        firstName: 'Mary',
+                        lastName: 'Johnson',
+                        email: 'mary.j@email.com',
+                        phone: '+1234567891',
+                        dob: '1992-03-15',
+                        voicePart: 'soprano',
+                        address: '456 Oak Ave',
+                        emergencyContact: 'Bob Johnson',
+                        emergencyPhone: '+0987654322',
+                        joinDate: new Date().toISOString().split('T')[0]
+                    },
+                    {
+                        id: 3,
+                        firstName: 'Peter',
+                        lastName: 'Smith',
+                        email: 'peter.smith@email.com',
+                        phone: '+1234567892',
+                        dob: '1988-07-20',
+                        voicePart: 'bass',
+                        address: '789 Pine St',
+                        emergencyContact: 'Anna Smith',
+                        emergencyPhone: '+0987654323',
+                        joinDate: new Date().toISOString().split('T')[0]
+                    },
+                    {
+                        id: 4,
+                        firstName: 'Sarah',
+                        lastName: 'Williams',
+                        email: 'sarah.w@email.com',
+                        phone: '+1234567893',
+                        dob: '1995-11-10',
+                        voicePart: 'alto',
+                        address: '321 Elm St',
+                        emergencyContact: 'Tom Williams',
+                        emergencyPhone: '+0987654324',
+                        joinDate: new Date().toISOString().split('T')[0]
+                    }
+                ];
+                localStorage.setItem('members', JSON.stringify(members));
+            }
+
+            if (!localStorage.getItem('songs')) {
+                const sampleAttachments = [
+                    {
+                        name: 'Ave_Maria_Sheet_Music.pdf',
+                        size: 245760,
+                        type: 'application/pdf',
+                        content: 'Sample PDF content for Ave Maria'
+                    },
+                    {
+                        name: 'Ave_Maria_Recording.mp3',
+                        size: 5242880,
+                        type: 'audio/mpeg',
+                        content: 'Sample audio content'
+                    },
+                    {
+                        name: 'Hallelujah_Choir_Sheet.pdf',
+                        size: 312560,
+                        type: 'application/pdf',
+                        content: 'Sample PDF content for Hallelujah'
+                    },
+                    {
+                        name: 'Hallelujah_Practice_Track.mp3',
+                        size: 7340032,
+                        type: 'audio/mpeg',
+                        content: 'Sample audio content'
+                    },
+                    {
+                        name: 'Amazing_Grace_Lyrics.pdf',
+                        size: 102400,
+                        type: 'application/pdf',
+                        content: 'Sample PDF content'
+                    }
+                ];
+                
+                const songs = [
+                    {
+                        id: 1,
+                        title: 'Ave Maria',
+                        composer: 'Franz Schubert',
+                        arranger: 'John Smith',
+                        category: 'sacred',
+                        keySignature: 'G',
+                        tempo: 'Andante',
+                        language: 'Latin',
+                        lyrics: 'Ave Maria, gratia plena...',
+                        uploadedBy: 'admin',
+                        uploadedDate: new Date().toISOString(),
+                        attachments: [sampleAttachments[0], sampleAttachments[1]]
+                    },
+                    {
+                        id: 2,
+                        title: 'Hallelujah',
+                        composer: 'George Frideric Handel',
+                        arranger: 'Mary Johnson',
+                        category: 'classical',
+                        keySignature: 'D',
+                        tempo: 'Allegro',
+                        language: 'English',
+                        lyrics: 'Hallelujah! Hallelujah!...',
+                        uploadedBy: 'admin',
+                        uploadedDate: new Date().toISOString(),
+                        attachments: [sampleAttachments[2], sampleAttachments[3]]
+                    },
+                    {
+                        id: 3,
+                        title: 'Amazing Grace',
+                        composer: 'John Newton',
+                        arranger: 'Traditional',
+                        category: 'sacred',
+                        keySignature: 'C',
+                        tempo: 'Moderato',
+                        language: 'English',
+                        lyrics: 'Amazing grace! How sweet the sound...',
+                        uploadedBy: 'mary_j',
+                        uploadedDate: new Date().toISOString(),
+                        attachments: [sampleAttachments[4]]
+                    }
+                ];
+                localStorage.setItem('songs', JSON.stringify(songs));
+            }
+
+            if (!localStorage.getItem('leaders')) {
+                const leaders = [
+                    {
+                        id: 1,
+                        memberId: 1,
+                        name: 'John Doe',
+                        role: 'choir_master',
+                        section: 'all',
+                        startDate: '2024-01-01',
+                        responsibilities: 'Overall choir direction and rehearsals'
+                    },
+                    {
+                        id: 2,
+                        memberId: 2,
+                        name: 'Mary Johnson',
+                        role: 'section_leader',
+                        section: 'soprano',
+                        startDate: '2024-01-15',
+                        responsibilities: 'Lead soprano section rehearsals'
+                    }
+                ];
+                localStorage.setItem('leaders', JSON.stringify(leaders));
+            }
+        }
+
+        initializeData();
+
+        let currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || null;
+        let memberFilters = { voicePart: '', joinDateRange: '', searchTerm: '' };
+        let songFilters = { category: '', language: '', searchTerm: '' };
+        let leaderFilters = { role: '', section: '', searchTerm: '' };
+        let uploadedFiles = [];
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.getElementById('mobileMenuToggle');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            toggleBtn.classList.toggle('active');
+            
+            const icon = toggleBtn.querySelector('i');
+            icon.className = sidebar.classList.contains('active') ? 'fas fa-times' : 'fas fa-bars';
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggleBtn = document.getElementById('mobileMenuToggle');
+            
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            toggleBtn.classList.remove('active');
+            
+            const icon = toggleBtn.querySelector('i');
+            icon.className = 'fas fa-bars';
+        }
+
+        function updateView() {
+            const landingPage = document.getElementById('landingPage');
+            const dashboardContainer = document.getElementById('dashboardContainer');
+            
+            if (currentUser) {
+                landingPage.classList.add('hidden');
+                dashboardContainer.classList.add('active');
+                document.getElementById('userFullName').textContent = currentUser.fullName;
+                document.getElementById('userRole').textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+                
+                updateSidebar();
+                closeMobileMenu();
+            } else {
+                landingPage.classList.remove('hidden');
+                dashboardContainer.classList.remove('active');
+            }
+        }
+
+        function updateSidebar() {
+            const sidebarNav = document.getElementById('sidebarNav');
+            let navLinks = '';
+            
+            navLinks += `
+                <a class="nav-link active" href="#" onclick="loadDashboardPage('dashboard'); if(window.innerWidth <= 768) closeMobileMenu();">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a class="nav-link" href="#" onclick="loadDashboardPage('members'); if(window.innerWidth <= 768) closeMobileMenu();">
+                    <i class="fas fa-users"></i> Members
+                </a>
+                <a class="nav-link" href="#" onclick="loadDashboardPage('songs'); if(window.innerWidth <= 768) closeMobileMenu();">
+                    <i class="fas fa-music"></i> Songs
+                </a>
+            `;
+            
+            if (currentUser.role === 'admin' || currentUser.role === 'leader') {
+                navLinks += `
+                    <a class="nav-link" href="#" onclick="loadDashboardPage('leaders'); if(window.innerWidth <= 768) closeMobileMenu();">
+                        <i class="fas fa-crown"></i> Leaders
+                    </a>
+                `;
+            }
+            
+            navLinks += `
+                <a class="nav-link" href="#" onclick="loadDashboardPage('events'); if(window.innerWidth <= 768) closeMobileMenu();">
+                    <i class="fas fa-calendar-alt"></i> Events
+                </a>
+                <a class="nav-link" href="#" onclick="loadDashboardPage('attendance'); if(window.innerWidth <= 768) closeMobileMenu();">
+                    <i class="fas fa-check-circle"></i> Attendance
+                </a>
+                <a class="nav-link" href="#" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            `;
+            
+            sidebarNav.innerHTML = navLinks;
+        }
+
+        function showAuthModal() {
+            new bootstrap.Modal(document.getElementById('authModal')).show();
+        }
+
+        function showAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelectorAll('.auth-tab')[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelectorAll('.auth-tab')[1].classList.add('active');
+                document.getElementById('signupForm').classList.add('active');
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users.find(u => (u.username === username || u.email === username) && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                sessionStorage.setItem('currentUser', JSON.stringify(user));
+                bootstrap.Modal.getInstance(document.getElementById('authModal')).hide();
+                updateView();
+            } else {
+                alert('Invalid username or password');
+            }
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+            
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const newUser = {
+                id: users.length + 1,
+                username: document.getElementById('signupUsername').value,
+                email: document.getElementById('signupEmail').value,
+                password: document.getElementById('signupPassword').value,
+                fullName: document.getElementById('signupFullname').value,
+                role: document.getElementById('signupRole').value
+            };
+            
+            if (users.some(u => u.username === newUser.username || u.email === newUser.email)) {
+                alert('Username or email already exists');
+                return;
+            }
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            alert('Registration successful! Please login.');
+            showAuthTab('login');
+            document.getElementById('signupForm').reset();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            sessionStorage.removeItem('currentUser');
+            updateView();
+            closeMobileMenu();
+        }
+
+        function loadDashboardPage(page) {
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.target.closest('.nav-link').classList.add('active');
+            
+            if (page === 'dashboard') {
+                location.reload(); // This will reload the page to show the welcome content
+            } else if (page === 'members') {
+                loadMembers();
+            } else if (page === 'songs') {
+                loadSongs();
+            } else if (page === 'leaders') {
+                if (currentUser.role === 'admin' || currentUser.role === 'leader') loadLeaders();
+                else { alert('Permission denied'); loadDashboardPage('dashboard'); }
+            } else if (page === 'events') {
+                loadEvents();
+            } else if (page === 'attendance') {
+                loadAttendance();
+            }
+        }
+
+        function loadMembers() {
+            const members = JSON.parse(localStorage.getItem('members')) || [];
+            const html = `
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Choir Members</h2>
+                        <div class="action-buttons">
+                            ${currentUser.role === 'admin' || currentUser.role === 'leader' ? `<button class="btn btn-custom me-2" onclick="showAddMember()"><i class="fas fa-user-plus me-2"></i>Add Member</button>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="filter-container">
+                        <div class="filter-title"><i class="fas fa-filter me-2"></i>Filter Members <span class="clear-filter" onclick="clearMemberFilters()">Clear All</span></div>
+                        <div class="filter-group">
+                            <div class="filter-item">
+                                <label class="filter-label">Voice Part</label>
+                                <select class="filter-select" id="voicePartFilter" onchange="applyMemberFilters()">
+                                    <option value="">All Voice Parts</option>
+                                    <option value="soprano">Soprano</option>
+                                    <option value="alto">Alto</option>
+                                    <option value="tenor">Tenor</option>
+                                    <option value="bass">Bass</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label class="filter-label">Join Date</label>
+                                <select class="filter-select" id="joinDateFilter" onchange="applyMemberFilters()">
+                                    <option value="">All Time</option>
+                                    <option value="last7days">Last 7 Days</option>
+                                    <option value="last30days">Last 30 Days</option>
+                                    <option value="last90days">Last 90 Days</option>
+                                    <option value="thisyear">This Year</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label class="filter-label">Search</label>
+                                <input type="text" class="filter-input" id="memberSearchFilter" placeholder="Search..." onkeyup="applyMemberFilters()">
+                            </div>
+                        </div>
+                        <div class="active-filters" id="activeMemberFilters"></div>
+                    </div>
+                    
+                    <div class="search-results-info" id="memberSearchInfo"></div>
+                    
+                    <div class="table-card">
+                        <table class="table table-hover">
+                            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Voice Part</th><th>Join Date</th><th>Actions</th></tr></thead>
+                            <tbody id="membersTableBody">${members.map(member => `<tr><td>${member.firstName} ${member.lastName}</td><td>${member.email || '-'}</td><td>${member.phone || '-'}</td><td><span class="badge-voice">${member.voicePart}</span></td><td>${member.joinDate || '-'}</td><td><button class="btn btn-sm btn-primary btn-action" onclick="viewMember(${member.id})"><i class="fas fa-eye"></i></button>${currentUser.role === 'admin' || currentUser.role === 'leader' ? `<button class="btn btn-sm btn-warning btn-action" onclick="editMember(${member.id})"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger btn-action" onclick="deleteMember(${member.id})"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`).join('')}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        function applyMemberFilters() {
+            const voicePart = document.getElementById('voicePartFilter').value;
+            const joinDateRange = document.getElementById('joinDateFilter').value;
+            const searchTerm = document.getElementById('memberSearchFilter').value.toLowerCase();
+            memberFilters = { voicePart, joinDateRange, searchTerm };
+            
+            const members = JSON.parse(localStorage.getItem('members')) || [];
+            let filtered = members.filter(m => !voicePart || m.voicePart === voicePart);
+            
+            if (joinDateRange) {
+                const limit = new Date();
+                if (joinDateRange === 'last7days') limit.setDate(limit.getDate() - 7);
+                else if (joinDateRange === 'last30days') limit.setDate(limit.getDate() - 30);
+                else if (joinDateRange === 'last90days') limit.setDate(limit.getDate() - 90);
+                else if (joinDateRange === 'thisyear') limit.setMonth(0, 1);
+                filtered = filtered.filter(m => new Date(m.joinDate) >= limit);
+            }
+            
+            if (searchTerm) filtered = filtered.filter(m => 
+                m.firstName.toLowerCase().includes(searchTerm) ||
+                m.lastName.toLowerCase().includes(searchTerm) ||
+                (m.email && m.email.toLowerCase().includes(searchTerm)) ||
+                (m.phone && m.phone.toLowerCase().includes(searchTerm)) ||
+                m.voicePart.toLowerCase().includes(searchTerm)
+            );
+            
+            const tbody = document.getElementById('membersTableBody');
+            document.getElementById('memberSearchInfo').textContent = `Found ${filtered.length} member${filtered.length !== 1 ? 's' : ''}`;
+            
+            if (!filtered.length) tbody.innerHTML = '<tr><td colspan="6" class="text-center">No members found</td></tr>';
+            else tbody.innerHTML = filtered.map(m => `<tr><td>${searchTerm ? highlightText(m.firstName + ' ' + m.lastName, searchTerm) : m.firstName + ' ' + m.lastName}</td><td>${m.email || '-'}</td><td>${m.phone || '-'}</td><td><span class="badge-voice">${searchTerm ? highlightText(m.voicePart, searchTerm) : m.voicePart}</span></td><td>${m.joinDate || '-'}</td><td><button class="btn btn-sm btn-primary btn-action" onclick="viewMember(${m.id})"><i class="fas fa-eye"></i></button>${currentUser.role === 'admin' || currentUser.role === 'leader' ? `<button class="btn btn-sm btn-warning btn-action" onclick="editMember(${m.id})"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger btn-action" onclick="deleteMember(${m.id})"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`).join('');
+        }
+
+        function clearMemberFilters() {
+            memberFilters = { voicePart: '', joinDateRange: '', searchTerm: '' };
+            document.getElementById('voicePartFilter').value = '';
+            document.getElementById('joinDateFilter').value = '';
+            document.getElementById('memberSearchFilter').value = '';
+            applyMemberFilters();
+        }
+
+        function loadSongs() {
+            const songs = JSON.parse(localStorage.getItem('songs')) || [];
+            const html = `
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Songs Library</h2>
+                        <div class="action-buttons">
+                            ${currentUser.role === 'admin' || currentUser.role === 'leader' ? `<button class="btn btn-custom me-2" onclick="showAddSong()"><i class="fas fa-plus-circle me-2"></i>Add Song</button>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="filter-container">
+                        <div class="filter-title"><i class="fas fa-filter me-2"></i>Filter Songs <span class="clear-filter" onclick="clearSongFilters()">Clear All</span></div>
+                        <div class="filter-group">
+                            <div class="filter-item">
+                                <label class="filter-label">Category</label>
+                                <select class="filter-select" id="categoryFilter" onchange="applySongFilters()">
+                                    <option value="">All Categories</option>
+                                    <option value="sacred">Sacred</option>
+                                    <option value="classical">Classical</option>
+                                    <option value="contemporary">Contemporary</option>
+                                    <option value="traditional">Traditional</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label class="filter-label">Language</label>
+                                <select class="filter-select" id="languageFilter" onchange="applySongFilters()">
+                                    <option value="">All Languages</option>
+                                    <option value="English">English</option>
+                                    <option value="Latin">Latin</option>
+                                    <option value="French">French</option>
+                                    <option value="Spanish">Spanish</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label class="filter-label">Search</label>
+                                <input type="text" class="filter-input" id="songSearchFilter" placeholder="Search..." onkeyup="applySongFilters()">
+                            </div>
+                        </div>
+                        <div class="active-filters" id="activeSongFilters"></div>
+                    </div>
+                    
+                    <div class="search-results-info" id="songSearchInfo"></div>
+                    
+                    <div class="table-card">
+                        <table class="table table-hover">
+                            <thead><tr><th>Title</th><th>Composer</th><th>Category</th><th>Language</th><th>Files</th><th>Actions</th></tr></thead>
+                            <tbody id="songsTableBody">${songs.map(song => `<tr><td>${song.title}</td><td>${song.composer || '-'}</td><td><span class="badge-voice">${song.category}</span></td><td>${song.language || '-'}</td><td>${song.attachments?.length ? `<i class="fas fa-paperclip" style="color: var(--secondary-color);"></i> ${song.attachments.length}` : '-'}</td><td><button class="btn btn-sm btn-primary btn-action" onclick="showSongDetails(${song.id})"><i class="fas fa-download"></i> Files</button>${currentUser.role === 'admin' || currentUser.role === 'leader' ? `<button class="btn btn-sm btn-warning btn-action" onclick="editSong(${song.id})"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger btn-action" onclick="deleteSong(${song.id})"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`).join('')}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        function applySongFilters() {
+            const category = document.getElementById('categoryFilter').value;
+            const language = document.getElementById('languageFilter').value;
+            const searchTerm = document.getElementById('songSearchFilter').value.toLowerCase();
+            songFilters = { category, language, searchTerm };
+            
+            const songs = JSON.parse(localStorage.getItem('songs')) || [];
+            let filtered = songs.filter(s => (!category || s.category === category) && (!language || s.language === language));
+            
+            if (searchTerm) filtered = filtered.filter(s => 
+                s.title.toLowerCase().includes(searchTerm) ||
+                (s.composer && s.composer.toLowerCase().includes(searchTerm)) ||
+                s.category.toLowerCase().includes(searchTerm) ||
+                (s.language && s.language.toLowerCase().includes(searchTerm))
+            );
+            
+            const tbody = document.getElementById('songsTableBody');
+            document.getElementById('songSearchInfo').textContent = `Found ${filtered.length} song${filtered.length !== 1 ? 's' : ''}`;
+            
+            if (!filtered.length) tbody.innerHTML = '<tr><td colspan="6" class="text-center">No songs found</td></tr>';
+            else tbody.innerHTML = filtered.map(s => `<tr><td>${searchTerm ? highlightText(s.title, searchTerm) : s.title}</td><td>${s.composer || '-'}</td><td><span class="badge-voice">${searchTerm ? highlightText(s.category, searchTerm) : s.category}</span></td><td>${s.language || '-'}</td><td>${s.attachments?.length ? `<i class="fas fa-paperclip" style="color: var(--secondary-color);"></i> ${s.attachments.length}` : '-'}</td><td><button class="btn btn-sm btn-primary btn-action" onclick="showSongDetails(${s.id})"><i class="fas fa-download"></i> Files</button>${currentUser.role === 'admin' || currentUser.role === 'leader' ? `<button class="btn btn-sm btn-warning btn-action" onclick="editSong(${s.id})"><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger btn-action" onclick="deleteSong(${s.id})"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`).join('');
+        }
+
+        function clearSongFilters() {
+            songFilters = { category: '', language: '', searchTerm: '' };
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('languageFilter').value = '';
+            document.getElementById('songSearchFilter').value = '';
+            applySongFilters();
+        }
+
+        function loadLeaders() {
+            if (currentUser.role !== 'admin' && currentUser.role !== 'leader') { alert('Permission denied'); return; }
+            const leaders = JSON.parse(localStorage.getItem('leaders')) || [];
+            const members = JSON.parse(localStorage.getItem('members')) || [];
+            const leaderData = leaders.map(l => { const m = members.find(m => m.id === l.memberId); return {...l, memberName: m ? `${m.firstName} ${m.lastName}` : 'Unknown', voicePart: m ? m.voicePart : 'Unknown', email: m ? m.email : 'Unknown'}; });
+            
+            const html = `
+                <div class="container-fluid">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Choir Leaders</h2>
+                        ${currentUser.role === 'admin' ? `<button class="btn btn-custom" onclick="showAddLeader()"><i class="fas fa-user-plus me-2"></i>Add Leader</button>` : ''}
+                    </div>
+                    <div class="table-card">
+                        <table class="table table-hover">
+                            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Section</th><th>Voice Part</th><th>Start Date</th><th>Actions</th></tr></thead>
+                            <tbody>${leaderData.map(l => `<tr><td>${l.memberName}</td><td>${l.email}</td><td><span class="badge-role">${l.role.replace('_', ' ')}</span></td><td><span class="badge-voice">${l.section}</span></td><td>${l.voicePart}</td><td>${l.startDate}</td><td>${currentUser.role === 'admin' ? `<button class="btn btn-sm btn-danger" onclick="removeLeader(${l.id})"><i class="fas fa-user-minus"></i></button>` : ''}</td></tr>`).join('')}</tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        function loadEvents() { 
+            document.getElementById('mainContent').innerHTML = '<div class="container-fluid"><h2>Events & Rehearsals</h2><div class="table-card text-center p-5"><i class="fas fa-calendar-alt fa-4x mb-3 text-muted"></i><h4>Coming Soon</h4></div></div>'; 
+        }
+        
+        function loadAttendance() { 
+            document.getElementById('mainContent').innerHTML = '<div class="container-fluid"><h2>Attendance Tracking</h2><div class="table-card text-center p-5"><i class="fas fa-check-circle fa-4x mb-3 text-muted"></i><h4>Coming Soon</h4></div></div>'; 
+        }
+        
+        function viewMember(id) { 
+            const m = JSON.parse(localStorage.getItem('members')).find(m => m.id === id); 
+            alert(`Member Details:\n\nName: ${m.firstName} ${m.lastName}\nEmail: ${m.email || 'N/A'}\nPhone: ${m.phone || 'N/A'}\nVoice Part: ${m.voicePart}\nJoin Date: ${m.joinDate || 'N/A'}`); 
+        }
+        
+        function showAddMember() { 
+            if (currentUser.role !== 'admin' && currentUser.role !== 'leader') { alert('Permission denied'); return; } 
+            document.getElementById('memberForm').reset(); 
+            document.getElementById('memberId').value = ''; 
+            new bootstrap.Modal(document.getElementById('memberModal')).show(); 
+        }
+        
+        function editMember(id) { 
+            if (currentUser.role !== 'admin' && currentUser.role !== 'leader') { alert('Permission denied'); return; } 
+            const m = JSON.parse(localStorage.getItem('members')).find(m => m.id === id); 
+            if (m) { 
+                document.getElementById('memberId').value = m.id; 
+                document.getElementById('firstName').value = m.firstName; 
+                document.getElementById('lastName').value = m.lastName; 
+                document.getElementById('memberEmail').value = m.email || ''; 
+                document.getElementById('memberPhone').value = m.phone || ''; 
+                document.getElementById('dob').value = m.dob || ''; 
+                document.getElementById('voicePart').value = m.voicePart; 
+                document.getElementById('address').value = m.address || ''; 
+                document.getElementById('emergencyContact').value = m.emergencyContact || ''; 
+                document.getElementById('emergencyPhone').value = m.emergencyPhone || ''; 
+                new bootstrap.Modal(document.getElementById('memberModal')).show(); 
+            } 
+        }
+        
+        function saveMember() { 
+            const members = JSON.parse(localStorage.getItem('members')) || []; 
+            const id = document.getElementById('memberId').value; 
+            const data = { 
+                id: id ? parseInt(id) : members.length + 1, 
+                firstName: document.getElementById('firstName').value, 
+                lastName: document.getElementById('lastName').value, 
+                email: document.getElementById('memberEmail').value, 
+                phone: document.getElementById('memberPhone').value, 
+                dob: document.getElementById('dob').value, 
+                voicePart: document.getElementById('voicePart').value, 
+                address: document.getElementById('address').value, 
+                emergencyContact: document.getElementById('emergencyContact').value, 
+                emergencyPhone: document.getElementById('emergencyPhone').value, 
+                joinDate: new Date().toISOString().split('T')[0] 
+            }; 
+            if (id) { 
+                const idx = members.findIndex(m => m.id === parseInt(id)); 
+                if (idx !== -1) members[idx] = data; 
+            } else members.push(data); 
+            localStorage.setItem('members', JSON.stringify(members)); 
+            bootstrap.Modal.getInstance(document.getElementById('memberModal')).hide(); 
+            loadMembers(); 
+        }
+        
+        function deleteMember(id) { 
+            if (currentUser.role !== 'admin' && currentUser.role !== 'leader') { alert('Permission denied'); return; } 
+            if (confirm('Delete member?')) { 
+                let members = JSON.parse(localStorage.getItem('members')).filter(m => m.id !== id); 
+                localStorage.setItem('members', JSON.stringify(members)); 
+                loadMembers(); 
+            } 
+        }
+
+        function showAddSong() { 
+            if (currentUser.role !== 'admin' && currentUser.role !== 'leader') { alert('Permission denied'); return; } 
+            document.getElementById('songForm').reset(); 
+            document.getElementById('songId').value = ''; 
+            uploadedFiles = []; 
+            updateFileList(); 
+            document.getElementById('existingAttachments').innerHTML = ''; 
+            new bootstrap.Modal(document.getElementById('songModal')).show(); 
+            setTimeout(initializeDragDrop, 500); 
+        }
+        
+        function editSong(id) { 
+            if (currentUser.role !== 'admin' && currentUser.role !== 'leader') { alert('Permission denied'); return; } 
+            const s = JSON.parse(localStorage.getItem('songs')).find(s => s.id === id); 
+            if (s) { 
+                document.getElementById('songId').value = s.id; 
+                document.getElementById('songTitle').value = s.title; 
+                document.getElementById('songCategory').value = s.category; 
+                document.getElementById('composer').value = s.composer || ''; 
+                document.getElementById('arranger').value = s.arranger || ''; 
+                document.getElementById('keySignature').value = s.keySignature || ''; 
+                document.getElementById('tempo').value = s.tempo || ''; 
+                document.getElementById('language').value = s.language || ''; 
+                document.getElementById('lyrics').value = s.lyrics || ''; 
+                uploadedFiles = []; 
+                if (s.attachments?.length) document.getElementById('existingAttachments').innerHTML = '<label class="form-label">Existing Attachments</label>' + s.attachments.map(a => `<div class="attachment-item"><div><i class="fas ${getFileIcon(a.type)}"></i> ${a.name} <small class="attachment-info">(${(a.size/1024).toFixed(2)} KB)</small></div></div>`).join(''); 
+                new bootstrap.Modal(document.getElementById('songModal')).show(); 
+                setTimeout(initializeDragDrop, 500); 
+            } 
+        }
+        
+        function saveSong() { 
+            const songs = JSON.parse(localStorage.getItem('songs')) || []; 
+            const id = document.getElementById('songId').value; 
+            const attachments = uploadedFiles.map(f => ({ name: f.name, size: f.size, type: f.type, content: 'Sample content' })); 
+            const data = { 
+                id: id ? parseInt(id) : songs.length + 1, 
+                title: document.getElementById('songTitle').value, 
+                category: document.getElementById('songCategory').value, 
+                composer: document.getElementById('composer').value, 
+                arranger: document.getElementById('arranger').value, 
+                keySignature: document.getElementById('keySignature').value, 
+                tempo: document.getElementById('tempo').value, 
+                language: document.getElementById('language').value, 
+                lyrics: document.getElementById('lyrics').value, 
+                uploadedBy: currentUser.username, 
+                uploadedDate: new Date().toISOString(), 
+                attachments: attachments 
+            }; 
+            if (id) { 
+                const idx = songs.findIndex(s => s.id === parseInt(id)); 
+                if (idx !== -1) { 
+                    if (!attachments.length && songs[idx].attachments) data.attachments = songs[idx].attachments; 
+                    songs[idx] = data; 
+                } 
+            } else songs.push(data); 
+            localStorage.setItem('songs', JSON.stringify(songs)); 
+            bootstrap.Modal.getInstance(document.getElementById('songModal')).hide(); 
+            loadSongs(); 
+        }
+        
+        function deleteSong(id) { 
+            if (currentUser.role !== 'admin' && currentUser.role !== 'leader') { alert('Permission denied'); return; } 
+            if (confirm('Delete song?')) { 
+                let songs = JSON.parse(localStorage.getItem('songs')).filter(s => s.id !== id); 
+                localStorage.setItem('songs', JSON.stringify(songs)); 
+                loadSongs(); 
+            } 
+        }
+
+        function showSongDetails(id) {
+            const s = JSON.parse(localStorage.getItem('songs')).find(s => s.id === id);
+            if (!s) return;
+            document.getElementById('songDetailsTitle').textContent = s.title;
+            let html = `<div class="row"><div class="col-md-6"><p><strong>Composer:</strong> ${s.composer || 'N/A'}</p><p><strong>Arranger:</strong> ${s.arranger || 'N/A'}</p><p><strong>Category:</strong> <span class="badge-voice">${s.category}</span></p><p><strong>Key:</strong> ${s.keySignature || 'N/A'}</p></div><div class="col-md-6"><p><strong>Tempo:</strong> ${s.tempo || 'N/A'}</p><p><strong>Language:</strong> ${s.language || 'N/A'}</p><p><strong>Uploaded:</strong> ${new Date(s.uploadedDate).toLocaleDateString()}</p></div></div><div class="mt-3"><h6>Lyrics:</h6><p style="white-space: pre-line; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 5px;">${s.lyrics || 'No lyrics'}</p></div>`;
+            if (s.attachments?.length) {
+                html += '<div class="song-attachments"><h6>Available Files</h6>';
+                s.attachments.forEach((a, i) => html += `<div class="attachment-item"><div><i class="fas ${getFileIcon(a.type)}"></i> ${a.name} <small class="attachment-info">(${(a.size/1024).toFixed(2)} KB)</small></div><button class="download-btn" onclick="downloadSongFile(${s.id}, ${i})"><i class="fas fa-download"></i> Download</button></div>`);
+                html += `<button class="download-all-btn mt-3" onclick="downloadAllSongFiles(${s.id})"><i class="fas fa-download"></i> Download All</button></div>`;
+            } else html += '<p class="text-muted mt-3">No files available</p>';
+            document.getElementById('songDetailsContent').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('songDetailsModal')).show();
+        }
+
+        function downloadSongFile(songId, idx) {
+            const s = JSON.parse(localStorage.getItem('songs')).find(s => s.id === songId);
+            if (!s?.attachments?.[idx]) return;
+            const f = s.attachments[idx];
+            const blob = new Blob([f.content || 'Sample content'], { type: f.type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = f.name;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadAllSongFiles(id) {
+            const s = JSON.parse(localStorage.getItem('songs')).find(s => s.id === id);
+            if (!s?.attachments?.length) return;
+            alert(`Downloading ${s.attachments.length} files...`);
+            s.attachments.forEach((_, i) => setTimeout(() => downloadSongFile(id, i), i * 500));
+        }
+
+        function showAddLeader() {
+            if (currentUser.role !== 'admin') { alert('Admin only'); return; }
+            const members = JSON.parse(localStorage.getItem('members')) || [];
+            const leaders = JSON.parse(localStorage.getItem('leaders')) || [];
+            const available = members.filter(m => !leaders.some(l => l.memberId === m.id));
+            const modalHtml = `
+                <div class="modal fade" id="leaderModal" tabindex="-1">
+                    <div class="modal-dialog"><div class="modal-content">
+                        <div class="modal-header"><h5 class="modal-title">Add Leader</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <div class="modal-body">
+                            <form id="leaderForm">
+                                <div class="mb-3"><label class="form-label">Select Member</label><select class="form-control" id="leaderMemberId" required><option value="">Choose...</option>${available.map(m => `<option value="${m.id}">${m.firstName} ${m.lastName} (${m.voicePart})</option>`).join('')}</select></div>
+                                <div class="mb-3"><label class="form-label">Role</label><select class="form-control" id="leaderRole" required><option value="choir_master">Choir Master</option><option value="assistant_choir_master">Assistant</option><option value="section_leader">Section Leader</option><option value="coordinator">Coordinator</option></select></div>
+                                <div class="mb-3"><label class="form-label">Section</label><select class="form-control" id="leaderSection" required><option value="all">All</option><option value="soprano">Soprano</option><option value="alto">Alto</option><option value="tenor">Tenor</option><option value="bass">Bass</option></select></div>
+                                <div class="mb-3"><label class="form-label">Start Date</label><input type="date" class="form-control" id="leaderStartDate" value="${new Date().toISOString().split('T')[0]}" required></div>
+                                <div class="mb-3"><label class="form-label">Responsibilities</label><textarea class="form-control" id="leaderResponsibilities" rows="3"></textarea></div>
+                            </form>
+                        </div>
+                        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button><button type="button" class="btn btn-primary" onclick="saveLeader()">Save</button></div>
+                    </div></div>
+                </div>`;
+            const old = document.getElementById('leaderModal');
+            if (old) old.remove();
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            new bootstrap.Modal(document.getElementById('leaderModal')).show();
+        }
+
+        function saveLeader() {
+            const mid = parseInt(document.getElementById('leaderMemberId').value);
+            const m = JSON.parse(localStorage.getItem('members')).find(m => m.id === mid);
+            if (!m) { alert('Select member'); return; }
+            const leaders = JSON.parse(localStorage.getItem('leaders')) || [];
+            leaders.push({
+                id: leaders.length + 1,
+                memberId: mid,
+                name: `${m.firstName} ${m.lastName}`,
+                role: document.getElementById('leaderRole').value,
+                section: document.getElementById('leaderSection').value,
+                startDate: document.getElementById('leaderStartDate').value,
+                responsibilities: document.getElementById('leaderResponsibilities').value
+            });
+            localStorage.setItem('leaders', JSON.stringify(leaders));
+            bootstrap.Modal.getInstance(document.getElementById('leaderModal')).hide();
+            loadLeaders();
+        }
+
+        function removeLeader(id) {
+            if (currentUser.role !== 'admin') { alert('Admin only'); return; }
+            if (confirm('Remove leader?')) {
+                let leaders = JSON.parse(localStorage.getItem('leaders')).filter(l => l.id !== id);
+                localStorage.setItem('leaders', JSON.stringify(leaders));
+                loadLeaders();
+            }
+        }
+
+        function initializeDragDrop() {
+            const drop = document.getElementById('dragDropArea');
+            const input = document.getElementById('fileInput');
+            if (!drop || !input) return;
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => { drop.addEventListener(e, (e) => e.preventDefault()); document.body.addEventListener(e, (e) => e.preventDefault()); });
+            ['dragenter', 'dragover'].forEach(e => drop.addEventListener(e, () => drop.classList.add('dragover')));
+            ['dragleave', 'drop'].forEach(e => drop.addEventListener(e, () => drop.classList.remove('dragover')));
+            drop.addEventListener('drop', (e) => { const files = e.dataTransfer.files; handleFiles(files); });
+            input.addEventListener('change', (e) => handleFiles(e.target.files));
+        }
+
+        function handleFiles(files) { uploadedFiles = [...uploadedFiles, ...Array.from(files)]; updateFileList(); }
+        
+        function removeFile(i) { uploadedFiles.splice(i, 1); updateFileList(); }
+        
+        function updateFileList() {
+            const list = document.getElementById('fileList');
+            if (!list) return;
+            if (!uploadedFiles.length) list.innerHTML = '';
+            else list.innerHTML = uploadedFiles.map((f, i) => `<div class="file-item"><div><i class="fas ${getFileIcon(f.type)}"></i> ${f.name} <small class="file-info">(${(f.size/1024).toFixed(2)} KB)</small></div><i class="fas fa-times remove-file" onclick="removeFile(${i})"></i></div>`).join('');
+        }
+
+        function getFileIcon(t) {
+            if (t.includes('pdf')) return 'fa-file-pdf';
+            if (t.includes('word') || t.includes('document')) return 'fa-file-word';
+            if (t.includes('audio') || t.includes('mp3') || t.includes('wav')) return 'fa-file-audio';
+            if (t.includes('text')) return 'fa-file-alt';
+            if (t.includes('xml') || t.includes('mxl')) return 'fa-file-code';
+            return 'fa-file';
+        }
+
+        function highlightText(t, s) { return s ? t.replace(new RegExp(`(${s})`, 'gi'), '<span class="highlight">$1</span>') : t; }
+
+        window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMobileMenu(); });
+
+        updateView();
+    </script>
+</body>
+</html>
