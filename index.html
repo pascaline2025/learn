@@ -1,83 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-
-    <!-- External CSS -->
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Hospital Management System - Streamline patient care and hospital operations" />
+  <meta name="theme-color" content="#2563eb" />
+  <title>Hospital Management System</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script type="module" crossorigin src="/assets/index-MT7amS-Z.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/uiStore-x3XWrHSl.js">
+  <link rel="modulepreload" crossorigin href="/assets/createLucideIcon-C_A6ulj4.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-CG1msH9P.css">
 </head>
-
-<body>
-
-    <div class="login-container">
-        <h2>Welcome Back</h2>
-
-        <div id="errorMessage" class="error"></div>
-
-        <form id="loginForm">
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" id="email" placeholder="Enter your email" required>
-            </div>
-
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" id="password" placeholder="Enter your password" required>
-            </div>
-
-            <button type="submit" class="btn">Login</button>
-
-            <p class="signup-text">
-                Don't have an account? <a href="#">Sign up</a>
-            </p>
-        </form>
-    </div>
-
-
-    <!-- JavaScript Validation + Fake Backend -->
-    <script>
-        document.getElementById("loginForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-
-            const email = document.getElementById("email").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const errorBox = document.getElementById("errorMessage");
-
-            // Basic validation
-            if (email === "" || password === "") {
-                errorBox.textContent = "Please fill in all fields.";
-                return;
-            }
-
-            if (!email.includes("@") || !email.includes(".")) {
-                errorBox.textContent = "Enter a valid email address.";
-                return;
-            }
-
-            if (password.length < 6) {
-                errorBox.textContent = "Password must be at least 6 characters.";
-                return;
-            }
-
-            errorBox.textContent = "";
-
-            // Fake backend check
-            const fakeUser = {
-                email: "test@gmail.com",
-                password: "123456"
-            };
-
-            if (email === fakeUser.email && password === fakeUser.password) {
-                alert("Login successful!");
-                window.location.href = "dashbord.html"; // redirect
-            } else {
-                errorBox.textContent = "Incorrect email or password.";
-            }
-        });
-    </script>
-
+<body class="bg-gray-50 dark:bg-gray-900">
+  <div id="app"></div>
 </body>
 </html>
-
